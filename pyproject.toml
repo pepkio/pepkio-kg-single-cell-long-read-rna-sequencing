@@ -1,0 +1,56 @@
+[project]
+name = "pepkio-kg-single-cell-long-read-rna-sequencing"
+version = "0.1.0"
+description = "Python package and benchmark data for Pepkio Knowledge Explorer: Single-Cell Long-Read RNA Sequencing"
+readme = "README_PYPI.md"
+license = { text = "MIT" }
+authors = [
+    { name = "Pepkio", email = "suzh5@aliyun.com" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "click>=8.1",
+]
+keywords = [
+    "single-cell",
+    "long-read",
+    "RNA-seq",
+    "isoform",
+    "knowledge-graph",
+    "benchmark",
+    "bioinformatics",
+    "pepkio",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+
+[project.scripts]
+pepkio-kg-single-cell-long-read-rna-sequencing = "pepkio_kg_single_cell_long_read_rna_sequencing.cli:main"
+
+[project.urls]
+Homepage = "https://www.pepkio.com/blogs/articles/single-cell-long-read-rna-sequencing"
+Repository = "https://github.com/pepkio/pepkio-kg-single-cell-long-read-rna-sequencing"
+Documentation = "https://pepkio.github.io/kg-single-cell-long-read-rna-sequencing/"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+pepkio_kg_single_cell_long_read_rna_sequencing = ["static/**/*"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.8",
+]

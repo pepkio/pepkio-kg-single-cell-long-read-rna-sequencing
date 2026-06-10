@@ -1,0 +1,68 @@
+#sankey-container {
+  width: 100%;
+  min-height: 520px;
+  height: calc(100vh - var(--header-height) - var(--footer-height) - 4rem);
+}
+
+.sankey-hint {
+  margin: 0.5rem 0;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  line-height: 1.4;
+}
+
+.sankey-legend {
+  margin-top: 1rem;
+}
+
+.sankey-legend h3 {
+  margin: 0 0 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.sankey-layer-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.35rem 0;
+  font-size: 0.8rem;
+}
+
+.sankey-layer-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.sankey-layer-swatch.layer-0 { background: var(--sankey-layer-0); }
+.sankey-layer-swatch.layer-1 { background: var(--sankey-layer-1); }
+.sankey-layer-swatch.layer-2 { background: var(--sankey-layer-2); }
+.sankey-layer-swatch.layer-3 { background: var(--sankey-layer-3); }
+.sankey-layer-swatch.layer-4 { background: var(--sankey-layer-4); }
+
+.sankey-filter-banner {
+  margin: 0.75rem 0;
+  padding: 0.5rem 0.65rem;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: var(--radius);
+  font-size: 0.8rem;
+  color: var(--color-text);
+}
+
+.sankey-filter-banner strong {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.sankey-filter-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}

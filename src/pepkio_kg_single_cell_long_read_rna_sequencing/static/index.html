@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Long-Read &amp; RNA-seq Knowledge Explorer</title>
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/learning-path.css">
+  <link rel="stylesheet" href="css/graph-explorer.css">
+  <link rel="stylesheet" href="css/graph.css">
+  <link rel="stylesheet" href="css/mindmap.css">
+  <link rel="stylesheet" href="css/sankey.css">
+  <link rel="stylesheet" href="css/drawer.css">
+  <link rel="stylesheet" href="css/benchmark.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/markmap-view@0.18.9/dist/style.css">
+  <style>[x-cloak] { display: none !important; }</style>
+  <script src="https://cdn.jsdelivr.net/npm/cytoscape@3.30.4/dist/cytoscape.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/webcola@3.4.0/WebCola/cola.min.js"></script>
+  <script>window.webcola = window.cola;</script>
+  <script src="https://cdn.jsdelivr.net/npm/cytoscape-cola@2.5.1/cytoscape-cola.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+</head>
+<body>
+  <div class="app" x-data="$store.kg" x-cloak>
+    <header class="header">
+      <div class="header-brand">
+        <h1>Long-Read &amp; RNA-seq Knowledge Explorer</h1>
+        <p class="header-subtitle" x-show="activeTab === 'explore'">Explore &amp; learn — mind tree, graph, guided path, or Sankey diagram</p>
+        <p class="header-subtitle" x-show="activeTab === 'benchmark'">Benchmark Q&amp;A set for LLM and agent evaluation</p>
+      </div>
+      <nav class="nav-tabs" aria-label="Main navigation">
+        <button type="button" class="nav-tab" :class="{ active: activeTab === 'explore' }"
+                @click="setTab('explore')">Explore</button>
+        <button type="button" class="nav-tab" :class="{ active: activeTab === 'benchmark' }"
+                @click="setTab('benchmark')">Benchmark</button>
+      </nav>
+    </header>
+
+    <div class="body" x-show="activeTab === 'explore'">
+      <aside class="sidebar" x-show="!loading && !error">
+        <h2>Explore</h2>
+
+        <div class="view-toggle">
+          <button type="button" class="view-btn" :class="{ active: exploreView === 'mindmap' }"
+                  @click="setView('mindmap')">Mind Tree</button>
+          <button type="button" class="view-btn" :class="{ active: exploreView === 'graph' }"
+                  @click="setView('graph')">Knowledge Graph</button>
+          <button type="button" class="view-btn" :class="{ active: exploreView === 'path' }"
+                  @click="setView('path')">Learning Path</button>
+          <button type="button" class="view-btn" :class="{ active: exploreView === 'sankey' }"
+                  @click="setView('sankey')">Sankey Diagram</button>
+        </div>
+
+        <!-- Presentation A: Mind Tree sidebar -->
+        <div x-show="exploreView === 'mindmap'">
+          <p class="mindmap-hint">Zoom and pan the concept hierarchy. Click any topic to see details and linked papers.</p>
+          <button type="button" class="btn" @click="fitMindmap()">Fit view</button>
+        </div>
+
+        <!-- Presentation D: Sankey sidebar -->
+        <div x-show="exploreView === 'sankey'">
+          <p class="sankey-hint">Ecosystem flow from sequencing platforms through protocols, methods, software, to applications. Click a node to select papers, then view them in the graph.</p>
+
+          <template x-if="sankeyFilter">
+            <div class="sankey-filter-banner">
+              <strong x-text="'Selected: ' + sankeyFilter.name"></strong>
+              <span x-text="sankeyFilter.paperIds.length + ' paper(s)'"></span>
+              <div class="sankey-filter-actions">
+                <button type="button" class="btn btn-primary" @click="viewInGraph()">View in graph</button>
+                <button type="button" class="btn" @click="clearSankeyFilter()">Clear filter</button>
+              </div>
+            </div>
+          </template>
+
+          <div class="sankey-legend">
+            <h3>Layers</h3>
+            <template x-for="(layer, i) in (knowledge?.sankey?.layers || [])" :key="layer">
+              <div class="sankey-layer-item">
+                <span class="sankey-layer-swatch" :class="'layer-' + i"></span>
+                <span x-text="layer"></span>
+              </div>
+            </template>
+          </div>
+        </div>
+
+        <!-- Presentation B: Knowledge Graph sidebar -->
+        <div x-show="exploreView === 'graph'">
+          <template x-if="sankeyFilter">
+            <div class="sankey-filter-banner">
+              <strong x-text="'Sankey filter: ' + sankeyFilter.name"></strong>
+              <span x-text="'Showing ' + sankeyFilter.paperIds.length + ' paper(s) and neighbors'"></span>
+              <button type="button" class="btn" @click="clearSankeyFilter()">Clear filter</button>
+            </div>
+          </template>
+
+          <label class="filter-label" for="search-input">Search</label>
+          <input id="search-input" class="filter-input" type="search"
+                 placeholder="Filter nodes…" x-model="searchQuery" @input="onSearchInput()">
+
+          <fieldset class="filter-group">
+            <legend>Node types</legend>
+            <label class="filter-check"><input type="checkbox" x-model="filterTypes.paper" @change="applyGraphFilters()"> Papers</label>
+            <label class="filter-check"><input type="checkbox" x-model="filterTypes.concept" @change="applyGraphFilters()"> Concepts</label>
+            <label class="filter-check"><input type="checkbox" x-model="filterTypes.tool" @change="applyGraphFilters()"> Tools</label>
+            <label class="filter-check"><input type="checkbox" x-model="filterTypes.external" @change="applyGraphFilters()"> External refs</label>
+          </fieldset>
+
+          <label class="filter-label" for="tag-select">Tag</label>
+          <select id="tag-select" class="filter-input" x-model="filterTag" @change="applyGraphFilters()">
+            <option value="">All tags</option>
+            <template x-for="tag in allTags" :key="tag">
+              <option :value="tag" x-text="tag"></option>
+            </template>
+          </select>
+
+          <div class="filter-row">
+            <div>
+              <label class="filter-label" for="year-min">Year from</label>
+              <input id="year-min" class="filter-input filter-input--short" type="number"
+                     x-model.number="yearMin" @change="applyGraphFilters()">
+            </div>
+            <div>
+              <label class="filter-label" for="year-max">Year to</label>
+              <input id="year-max" class="filter-input filter-input--short" type="number"
+                     x-model.number="yearMax" @change="applyGraphFilters()">
+            </div>
+          </div>
+
+          <div class="path-legend">
+            <h3>Legend</h3>
+            <div class="legend-item"><span class="legend-swatch paper"></span> Paper</div>
+            <div class="legend-item"><span class="legend-swatch concept"></span> Concept</div>
+            <div class="legend-item"><span class="legend-swatch tool"></span> Tool</div>
+            <div class="legend-item"><span class="legend-swatch external"></span> External</div>
+          </div>
+
+          <div class="sidebar-actions">
+            <button type="button" class="btn" @click="resetGraphView()">Reset view</button>
+            <button type="button" class="btn" @click="exportPng()">Export PNG</button>
+          </div>
+        </div>
+
+        <!-- Presentation C: Learning Path sidebar -->
+        <template x-if="exploreView === 'path' && pathStep">
+        <div class="learning-path-panel">
+          <p class="path-progress-label"
+             x-text="'Step ' + (pathStep.index + 1) + ' of ' + pathStep.total"></p>
+          <div class="path-progress-bar" role="progressbar"
+               :aria-valuenow="pathStep.index + 1"
+               :aria-valuemin="1"
+               :aria-valuemax="pathStep.total">
+            <div class="path-progress-fill" :style="'width:' + progressPercent() + '%'"></div>
+          </div>
+
+          <div class="path-step-content">
+            <template x-if="pathStep.detail">
+              <div>
+                <span class="path-node-type" :class="pathStep.detail.type"
+                      x-text="pathStep.detail.type"></span>
+                <h3 class="path-node-title" x-text="pathStep.detail.label"></h3>
+              </div>
+            </template>
+
+            <p class="path-narration" x-text="pathStep.narration"></p>
+          </div>
+
+          <div class="path-nav">
+            <button type="button" class="btn" @click="goPrev()" :disabled="!canGoPrev()">← Prev</button>
+            <button type="button" class="btn btn-primary" @click="goNext()" :disabled="!canGoNext()">Next →</button>
+          </div>
+
+          <button type="button" class="btn" @click="openCurrentNode()">View details</button>
+
+          <div class="path-legend">
+            <h3>Legend</h3>
+            <div class="legend-item"><span class="legend-swatch paper"></span> Paper</div>
+            <div class="legend-item"><span class="legend-swatch concept"></span> Concept</div>
+            <div class="legend-item"><span class="legend-swatch tool"></span> Tool</div>
+            <div class="legend-item"><span class="legend-swatch external"></span> External</div>
+          </div>
+        </div>
+        </template>
+      </aside>
+
+      <main class="main">
+        <section class="panel" x-show="!loading && !error">
+          <div class="panel-view" x-show="exploreView === 'mindmap'">
+            <div id="mindmap-container" role="img" aria-label="Concept hierarchy mind tree"></div>
+          </div>
+
+          <div class="panel-view" x-show="exploreView === 'sankey'">
+            <div id="sankey-container" role="img" aria-label="Field ecosystem Sankey diagram"></div>
+          </div>
+
+          <div class="panel-view" x-show="exploreView === 'graph' || exploreView === 'path'">
+            <div class="graph-toolbar">
+              <button type="button" class="btn" @click="fitGraph()">Fit view</button>
+              <button type="button" class="btn" x-show="exploreView === 'graph'" @click="exportPng()">Export PNG</button>
+            </div>
+            <div id="graph-container" role="img"
+                 :aria-label="exploreView === 'path' ? 'Knowledge graph with current learning step highlighted' : 'Knowledge graph network'"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="body" x-show="activeTab === 'benchmark' && !loading && !error">
+      <aside class="sidebar">
+        <h2>Benchmark</h2>
+        <p class="bench-hint">Browse field-specific Q&amp;A pairs for evaluating LLMs and agents. Filter, inspect ground-truth answers, and export subsets.</p>
+
+        <label class="filter-label" for="bench-search">Search</label>
+        <input id="bench-search" class="filter-input" type="search"
+               placeholder="Filter questions…" x-model="benchSearch" @input="onBenchFilterChange()">
+
+        <label class="filter-label" for="bench-category">Category</label>
+        <select id="bench-category" class="filter-input" x-model="benchCategory" @change="onBenchFilterChange()">
+          <option value="">All categories</option>
+          <template x-for="cat in benchCategories" :key="cat">
+            <option :value="cat" x-text="cat"></option>
+          </template>
+        </select>
+
+        <label class="filter-label" for="bench-difficulty">Difficulty</label>
+        <select id="bench-difficulty" class="filter-input" x-model="benchDifficulty" @change="onBenchFilterChange()">
+          <option value="">All difficulties</option>
+          <template x-for="diff in benchDifficulties" :key="diff">
+            <option :value="diff" x-text="diff"></option>
+          </template>
+        </select>
+
+        <p class="bench-count" x-text="filteredBenchmark().length + ' of ' + (knowledge?.benchmark?.length || 0) + ' questions'"></p>
+
+        <div class="bench-export">
+          <button type="button" class="btn" @click="downloadBenchmarkJson()"
+                  x-text="'Download JSON (' + filteredBenchmark().length + ')'"></button>
+          <button type="button" class="btn" @click="downloadBenchmarkCsv()"
+                  x-text="'Download CSV (' + filteredBenchmark().length + ')'"></button>
+          <button type="button" class="btn btn-primary" @click="copyBenchmarkPrompt()">Copy prompt template</button>
+          <p class="bench-copy-status" x-show="benchCopyStatus" x-text="benchCopyStatus"></p>
+        </div>
+      </aside>
+
+      <main class="main">
+        <section class="panel bench-panel">
+          <div id="benchmark-stats-chart" class="bench-stats" role="img" aria-label="Benchmark statistics by category and difficulty"></div>
+
+          <div class="bench-table-wrap">
+            <table class="bench-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Category</th>
+                  <th>Difficulty</th>
+                  <th>Question</th>
+                  <th>Ground Truth</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="item in filteredBenchmark()" :key="item.id">
+                  <tr class="bench-row bench-group" :class="{ expanded: expandedBenchId === item.id }"
+                      @click="toggleBenchRow(item.id)">
+                    <td class="bench-id" x-text="item.id"></td>
+                    <td x-text="item.category"></td>
+                    <td>
+                      <span class="bench-difficulty" :class="item.difficulty" x-text="item.difficulty"></span>
+                    </td>
+                    <td class="bench-cell-truncate" x-text="truncateBench(item.question)"></td>
+                    <td class="bench-cell-truncate" x-text="truncateBench(item.ground_truth_answer)"></td>
+                  </tr>
+                  <tr class="bench-group" x-show="expandedBenchId === item.id">
+                    <td colspan="5" class="bench-detail">
+                      <h4>Question</h4>
+                      <p x-text="item.question"></p>
+                      <h4>Ground Truth Answer</h4>
+                      <p x-text="item.ground_truth_answer"></p>
+                      <h4>Source Paper</h4>
+                      <p>
+                        <span class="bench-paper-link" @click.stop="openBenchPaper(item)"
+                              x-text="benchPaperLabel(item)"></span>
+                        <template x-if="benchPaperDoi(item)">
+                          <span> —
+                            <a :href="doiUrl(benchPaperDoi(item))" target="_blank" rel="noopener"
+                               @click.stop x-text="benchPaperDoi(item)"></a>
+                          </span>
+                        </template>
+                      </p>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+            <p class="bench-empty"
+               x-show="knowledge && filteredBenchmark().length === 0"
+               x-text="(knowledge.benchmark && knowledge.benchmark.length)
+                 ? 'No benchmark questions match the current filters.'
+                 : 'No benchmark data loaded.'"></p>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="loading" x-show="loading">Loading knowledge data…</div>
+    <div class="error" x-show="error" x-text="error"></div>
+
+    <template x-if="drawerOpen && selectedNode">
+      <div>
+        <div class="drawer-backdrop" @click="closeDrawer()"></div>
+        <aside class="drawer" role="dialog" aria-label="Node details">
+          <div class="drawer-header">
+            <h3 x-text="selectedNode.label"></h3>
+            <button class="drawer-close" @click="closeDrawer()" aria-label="Close">×</button>
+          </div>
+          <div class="drawer-body">
+            <span class="drawer-type" :class="selectedNode.type" x-text="selectedNode.type"></span>
+
+            <template x-if="selectedNode.type === 'paper'">
+              <div>
+                <p class="drawer-meta"
+                   x-text="(selectedNode.authors || []).slice(0, 4).join(', ') + (selectedNode.year ? ' (' + selectedNode.year + ')' : '')"></p>
+                <p class="drawer-desc" x-show="selectedNode.description" x-text="selectedNode.description"></p>
+                <a class="drawer-doi" x-show="selectedNode.doi"
+                   :href="doiUrl(selectedNode.doi)" target="_blank" rel="noopener"
+                   x-text="'DOI: ' + selectedNode.doi"></a>
+                <div class="drawer-tags" x-show="selectedNode.tags?.length">
+                  <template x-for="tag in selectedNode.tags" :key="tag">
+                    <span class="drawer-tag" x-text="tag"></span>
+                  </template>
+                </div>
+              </div>
+            </template>
+
+            <template x-if="selectedNode.type === 'concept' || selectedNode.type === 'tool'">
+              <div>
+                <p class="drawer-meta" x-show="selectedNode.toolType" x-text="selectedNode.toolType"></p>
+                <p class="drawer-desc" x-show="selectedNode.description" x-text="selectedNode.description"></p>
+                <a class="drawer-doi" x-show="selectedNode.url"
+                   :href="selectedNode.url" target="_blank" rel="noopener">Official link</a>
+                <div class="drawer-section" x-show="selectedNode.papers?.length">
+                  <h4>Source Papers</h4>
+                  <ul class="drawer-papers">
+                    <template x-for="paper in selectedNode.papers" :key="paper.id">
+                      <li>
+                        <span x-text="paper.title"></span>
+                        <template x-if="paper.doi">
+                          — <a :href="doiUrl(paper.doi)" target="_blank" rel="noopener" x-text="paper.doi"></a>
+                        </template>
+                      </li>
+                    </template>
+                  </ul>
+                </div>
+              </div>
+            </template>
+
+            <template x-if="selectedNode.type === 'external'">
+              <div>
+                <p class="drawer-desc" x-show="selectedNode.description" x-text="selectedNode.description"></p>
+                <a class="drawer-doi" x-show="selectedNode.doi"
+                   :href="doiUrl(selectedNode.doi)" target="_blank" rel="noopener"
+                   x-text="'DOI: ' + selectedNode.doi"></a>
+              </div>
+            </template>
+
+            <template x-if="selectedNode.type === 'text'">
+              <p class="drawer-desc" x-show="selectedNode.description" x-text="selectedNode.description"></p>
+              <p class="drawer-desc" x-show="!selectedNode.description">No linked entity for this node.</p>
+            </template>
+          </div>
+        </aside>
+      </div>
+    </template>
+
+    <footer class="footer" x-show="knowledge">
+      <span x-text="'v' + (knowledge?.meta?.version || '')"></span>
+      <span x-text="(knowledge?.meta?.paperCount || 0) + ' papers'"></span>
+      <span x-text="(knowledge?.benchmark?.length || 0) + ' benchmark Q&As'"></span>
+      <span x-text="'Updated ' + (knowledge?.meta?.lastUpdated || '')"></span>
+    </footer>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
+</body>
+</html>

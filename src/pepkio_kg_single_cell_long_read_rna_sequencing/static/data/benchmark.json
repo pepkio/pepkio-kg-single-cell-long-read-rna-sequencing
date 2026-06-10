@@ -1,0 +1,282 @@
+{
+  "meta": {
+    "title": "Long-Read & RNA-seq Isoform Knowledge Explorer",
+    "version": "0.1.0",
+    "lastUpdated": "2026-06-09",
+    "questionCount": 34
+  },
+  "benchmark": [
+    {
+      "id": "bench_10.1101/2025.07.21.665920_1",
+      "source_paper_id": "10.1101/2025.07.21.665920",
+      "question": "In the systematic benchmark by Hamraoui et al., which method achieved the highest F1-score in UMI clustering on simulated R9.4.1 data?",
+      "ground_truth_answer": "wf-single-cell, with a mean F1-score of 0.8 and highest ARI of 0.81.",
+      "category": "Benchmarking",
+      "difficulty": "beginner"
+    },
+    {
+      "id": "bench_10.1101/2025.07.21.665920_2",
+      "source_paper_id": "10.1101/2025.07.21.665920",
+      "question": "Which hybrid method failed to process the PromethION datasets due to excessive memory usage?",
+      "ground_truth_answer": "Snuupy, which required up to 200 GB of RAM for the BLAST step and was deemed unsuitable for large-scale datasets.",
+      "category": "Tools",
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "bench_10.1101/2025.07.21.665920_3",
+      "source_paper_id": "10.1101/2025.07.21.665920",
+      "question": "According to the benchmark, what is the key advantage of long-read methods over short-read CellRanger for cell type annotation?",
+      "ground_truth_answer": "Long-read methods like Bambu and wf-single-cell outperform CellRanger because short-read data suffers from 3' bias due to incomplete 3'-UTR annotations, while long-read sequencing enables accurate gene expression quantification across the full transcript, leading to more precise cell-type separation.",
+      "category": "Methods",
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "bench_10.1101/2025.07.21.665920_4",
+      "source_paper_id": "10.1101/2025.07.21.665920",
+      "question": "How does the UMI error correction strategy differ between wf-single-cell and Bambu, and what impact does this have on gene expression quantification accuracy?",
+      "ground_truth_answer": "wf-single-cell uses a directional graph approach from UMI-tools for UMI clustering, resulting in high-fidelity UMI correction and accurate gene expression estimation. Bambu directly merges raw UMI sequences without error correction, leading to overestimation of expression counts, especially under high sequencing saturation and error rates.",
+      "category": "Concepts",
+      "difficulty": "advanced"
+    },
+    {
+      "id": "bench_10.1101/2025.07.21.665920_5",
+      "source_paper_id": "10.1101/2025.07.21.665920",
+      "question": "Which two ONT chemistries were compared in the simulated datasets to assess the impact of sequencing quality on method performance?",
+      "ground_truth_answer": "R9.4.1 (median Phred score 13) and R10.4.1 (median Phred score 20), with R10.4.1 showing overall improved method performance.",
+      "category": "Platforms",
+      "difficulty": "beginner"
+    },
+    {
+      "id": "bench_10.1101/2025.09.11.675724_1",
+      "source_paper_id": "10.1101/2025.09.11.675724",
+      "question": "Which long-read sequencing protocols are included in the LongBench dataset?",
+      "ground_truth_answer": "LongBench includes three long-read protocols: Oxford Nanopore Technologies (ONT) PCR-cDNA, ONT direct RNA, and PacBio Kinnex.",
+      "category": "Platforms",
+      "difficulty": "beginner"
+    },
+    {
+      "id": "bench_10.1101/2025.09.11.675724_2",
+      "source_paper_id": "10.1101/2025.09.11.675724",
+      "question": "What is the name and purpose of the custom tool used in this study to identify reads resulting from internal priming?",
+      "ground_truth_answer": "PrimeSpotter is a custom tool that identifies reads likely resulting from internal priming at genomically encoded A stretches within transcripts, rather than at genuine polyA tails.",
+      "category": "Tools",
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "bench_10.1101/2025.09.11.675724_3",
+      "source_paper_id": "10.1101/2025.09.11.675724",
+      "question": "According to LongBench, which sequencing platform showed the highest correlation between observed and expected abundances for spike-in controls?",
+      "ground_truth_answer": "ONT direct RNA (dRNA) consistently achieved the highest correlation between observed and expected transcript abundances for spike-in controls across all platforms.",
+      "category": "Benchmarking",
+      "difficulty": "advanced"
+    },
+    {
+      "id": "bench_10.1101/2025.09.11.675724_4",
+      "source_paper_id": "10.1101/2025.09.11.675724",
+      "question": "What is the key advantage of long-read RNA-seq over short-read in resolving transcript-level expression?",
+      "ground_truth_answer": "Long reads reduce read-to-transcript ambiguity, enabling more accurate and stable isoform assignment compared to short reads, especially for multi-isoform genes.",
+      "category": "Concepts",
+      "difficulty": "beginner"
+    },
+    {
+      "id": "bench_10.1093/nargab/lqaf089_1",
+      "source_paper_id": "10.1093/nargab/lqaf089",
+      "question": "What is the name of the PacBio long-read sequencing protocol evaluated in this study, and what is its newer name?",
+      "ground_truth_answer": "The protocol is called MAS-ISO-seq, which has been relabeled as Kinnex full-length RNA sequencing.",
+      "category": "Platforms",
+      "difficulty": "beginner"
+    },
+    {
+      "id": "bench_10.1093/nargab/lqaf089_2",
+      "source_paper_id": "10.1093/nargab/lqaf089",
+      "question": "How did the authors match the same original cDNA molecules between short-read and long-read sequencing data?",
+      "ground_truth_answer": "They matched molecules through cell barcode and unique molecular identifier (UMI) tags, enabling a per-molecule cross-comparison of sequencing readouts.",
+      "category": "Methods",
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "bench_10.1093/nargab/lqaf089_3",
+      "source_paper_id": "10.1093/nargab/lqaf089",
+      "question": "What tool was used for empty droplet detection in PacBio data, and what percentage of CellRanger-specific cells were classified as empty droplets by this tool?",
+      "ground_truth_answer": "BLAZE was used for empty droplet detection in PacBio data. It classified 9%–32% of CellRanger-specific cells as empty droplets.",
+      "category": "Tools",
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "bench_10.1093/nargab/lqaf089_4",
+      "source_paper_id": "10.1093/nargab/lqaf089",
+      "question": "What are the three types of artefactual transcripts distinguished by the PacBio pipeline, and which category accounted for the largest proportion of filtered reads?",
+      "ground_truth_answer": "The three types are intra-priming, RT-switching, and low coverage/non-canonical (LCNC) isoforms. LCNC accounted for the largest proportion, with an average of 27% of reads and 48% of isoforms filtered.",
+      "category": "Concepts",
+      "difficulty": "advanced"
+    },
+    {
+      "id": "bench_10.1093/nargab/lqaf089_5",
+      "source_paper_id": "10.1093/nargab/lqaf089",
+      "question": "What was the effect of artefact filtering on gene count correlation between PacBio and Illumina data, and which genes were most affected?",
+      "ground_truth_answer": "Artefact filtering reduced the gene count correlation between the two methods (from R > 0.92 to R between 0.9 and 0.95) and biased against longer genes, especially those longer than 4000 bp, leading to a decrease in counts for those genes.",
+      "category": "Benchmarking",
+      "difficulty": "advanced"
+    },
+    {
+      "id": "bench_10.1016/j.jare.2024.05.020_1",
+      "source_paper_id": "10.1016/j.jare.2024.05.020",
+      "question": "According to Deng et al., which long-read sequencing platform demonstrated higher accuracy in identifying novel transcripts and allele-specific expression?",
+      "ground_truth_answer": "PacBio (Pacific Biosciences) outperformed Oxford Nanopore Technologies (ONT) in the accuracy of novel transcript identification and allele-specific gene/isoform expression, attributed to its higher sequencing quality.",
+      "category": "Platforms",
+      "difficulty": "beginner"
+    },
+    {
+      "id": "bench_10.1016/j.jare.2024.05.020_2",
+      "source_paper_id": "10.1016/j.jare.2024.05.020",
+      "question": "What method was used to validate novel isoforms captured by each TGS platform in this study?",
+      "ground_truth_answer": "Novel isoforms were validated using RT-PCR followed by Sanger sequencing; 11 out of 15 PacBio-specific transcripts were confirmed compared to 3 out of 14 ONT-specific transcripts.",
+      "category": "Methods",
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "bench_10.1016/j.jare.2024.05.020_3",
+      "source_paper_id": "10.1016/j.jare.2024.05.020",
+      "question": "What is the name of the software used to extract full-length transcript fragments (FLTs) from PacBio reads in this study?",
+      "ground_truth_answer": "Longbow, the official software, was used to extract FLTs from PacBio sequencing reads.",
+      "category": "Tools",
+      "difficulty": "beginner"
+    },
+    {
+      "id": "bench_10.1016/j.jare.2024.05.020_4",
+      "source_paper_id": "10.1016/j.jare.2024.05.020",
+      "question": "How did the study define 'unknown reads' in the context of allele-specific expression analysis?",
+      "ground_truth_answer": "Unknown reads were defined as reads that did not cover any SNP sites and therefore could not be assigned to a specific parental allele.",
+      "category": "Concepts",
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "bench_10.1016/j.jare.2024.05.020_5",
+      "source_paper_id": "10.1016/j.jare.2024.05.020",
+      "question": "What recommendation does the study make regarding the number of cells per library for TGS-based scRNA-seq when sequencing yield is fixed?",
+      "ground_truth_answer": "The study recommends using more cells in a library (up to approximately 5000 cells) rather than maximizing per-cell gene detection, because a larger cell sample yields more cell-type-specific DEGs and DEIs despite lower per-cell gene coverage.",
+      "category": "Benchmarking",
+      "difficulty": "advanced"
+    },
+    {
+      "id": "bench_10.1093/bib/bbaf655_1",
+      "source_paper_id": "10.1093/bib/bbaf655",
+      "question": "What is the primary advantage of single-cell long-read sequencing (SCLR-seq) over conventional short-read scRNA-seq?",
+      "ground_truth_answer": "SCLR-seq sequences full-length RNA molecules, enabling accurate characterization of isoform diversity, identification of novel splice variants, and quantification of percent spliced-in values at single-cell resolution, overcoming the short-read limitations of conventional scRNA-seq.",
+      "category": "Concepts",
+      "difficulty": "beginner"
+    },
+    {
+      "id": "bench_10.1093/bib/bbaf655_2",
+      "source_paper_id": "10.1093/bib/bbaf655",
+      "question": "Which two long-read sequencing platforms are primarily used for SCLR-seq, and what is a key trade-off between them?",
+      "ground_truth_answer": "Pacific Biosciences (PacBio) and Oxford Nanopore Technologies (ONT) are the two main platforms. PacBio provides higher accuracy (up to 99.95% with HiFi reads) but has lower throughput and higher cost, while ONT offers higher throughput and lower cost but has higher error rates.",
+      "category": "Platforms",
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "bench_10.1093/bib/bbaf655_3",
+      "source_paper_id": "10.1093/bib/bbaf655",
+      "question": "Name two end-to-end pipelines for SCLR-seq data analysis and the sequencing platform they are predominantly designed for.",
+      "ground_truth_answer": "FLAMES and SiCeLoRe are two end-to-end pipelines, both predominantly designed for Oxford Nanopore Technologies (ONT) data.",
+      "category": "Tools",
+      "difficulty": "beginner"
+    },
+    {
+      "id": "bench_10.1093/bib/bbaf655_4",
+      "source_paper_id": "10.1093/bib/bbaf655",
+      "question": "What is the role of SQANTI3 in SCLR-seq analysis, and how does it classify isoforms?",
+      "ground_truth_answer": "SQANTI3 classifies and filters isoforms from long-read sequencing data by comparing splice junctions to annotations. It categorizes isoforms into full splice match, incomplete splice match, novel in catalog (NIC), novel not in catalog (NNIC), fusion, intergenic, genic intron, genic genomic, and antisense, and filters technical artifacts.",
+      "category": "Methods",
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "bench_10.1093/bib/bbaf655_5",
+      "source_paper_id": "10.1093/bib/bbaf655",
+      "question": "What is a key challenge in UMI error correction for SCLR-seq data, and how does Longcell address it?",
+      "ground_truth_answer": "A key challenge is UMI crowding, where the edit distance between true UMIs decreases as gene expression increases, leading to ambiguous UMI assignment. Longcell addresses this by using an iterative clustering procedure to cluster putative UMI sequences and correct truncation and mapping errors.",
+      "category": "Benchmarking",
+      "difficulty": "advanced"
+    },
+    {
+      "id": "bench_10.1038/s41592-023-02026-3_1",
+      "source_paper_id": "10.1038/s41592-023-02026-3",
+      "question": "What sequencing platforms were used in this benchmark study?",
+      "ground_truth_answer": "Illumina short-read and Oxford Nanopore Technologies (ONT) long-read platforms.",
+      "category": "Platforms",
+      "difficulty": "beginner"
+    },
+    {
+      "id": "bench_10.1038/s41592-023-02026-3_2",
+      "source_paper_id": "10.1038/s41592-023-02026-3",
+      "question": "In the isoform detection comparison, which two tools performed best and in which aspects?",
+      "ground_truth_answer": "bambu achieved the highest recall (~0.91) and precision (~0.62) in the full data set. StringTie2 excelled in the downsampled analysis, recovering 80% of removed sequins with the highest precision.",
+      "category": "Tools",
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "bench_10.1038/s41592-023-02026-3_3",
+      "source_paper_id": "10.1038/s41592-023-02026-3",
+      "question": "How did the authors use in silico mixtures and sequins to evaluate DTE and DTU methods?",
+      "ground_truth_answer": "In silico mixtures provided a series of comparisons with known biological differences between pure cell lines, allowing assessment of recovery and inconsistency rates. Sequins provided ground-truth for calculating true positive rate (TPR) and false discovery rate (FDR). Together, they enabled genome-wide and targeted evaluation of differential analysis tools.",
+      "category": "Methods",
+      "difficulty": "advanced"
+    },
+    {
+      "id": "bench_10.1038/s41592-023-02026-3_4",
+      "source_paper_id": "10.1038/s41592-023-02026-3",
+      "question": "What are sequins and what purpose do they serve in this study?",
+      "ground_truth_answer": "Sequins are synthetic spliced spike-in RNAs with known sequences, abundance, and splicing patterns. They are added to RNA samples to provide ground-truth for evaluating accuracy of isoform detection, quantification, and differential analysis methods.",
+      "category": "Concepts",
+      "difficulty": "beginner"
+    },
+    {
+      "id": "bench_10.1038/s41592-023-02026-3_5",
+      "source_paper_id": "10.1038/s41592-023-02026-3",
+      "question": "What was the main conclusion regarding differential transcript usage (DTU) analysis tools?",
+      "ground_truth_answer": "No DTU method achieved a balance between power and false discovery control; DRIMSeq and DEXSeq had high sensitivity but high FDR, while edgeR-diffSpliceDGE had best FDR control but lowest power. The study suggests further method development is needed.",
+      "category": "Benchmarking",
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "bench_10.1038/s41592-025-02623-4_1",
+      "source_paper_id": "10.1038/s41592-025-02623-4",
+      "question": "In the SG-NEx study, which long-read RNA sequencing protocol generated the highest throughput per sample?",
+      "ground_truth_answer": "PCR-amplified cDNA sequencing (cDNA protocol) consistently generated the highest throughput per sample among the long-read protocols.",
+      "category": "Platforms",
+      "difficulty": "beginner"
+    },
+    {
+      "id": "bench_10.1038/s41592-025-02623-4_2",
+      "source_paper_id": "10.1038/s41592-025-02623-4",
+      "question": "What is a 'full-splice-match read' and why is it important in the SG-NEx study?",
+      "ground_truth_answer": "A full-splice-match read is a long read that spans all exon junctions of a transcript, providing unambiguous evidence for the complete isoform structure. It is important because it enables identification of alternative isoforms, fusion transcripts, and complex splicing events.",
+      "category": "Concepts",
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "bench_10.1038/s41592-025-02623-4_3",
+      "source_paper_id": "10.1038/s41592-025-02623-4",
+      "question": "How did the authors of the SG-NEx study simulate short-read RNA-seq from long-read data to assess the impact of fragmentation on transcript quantification?",
+      "ground_truth_answer": "They aligned long reads to the transcriptome, performed error correction using the reference transcriptome sequence, and then sampled 150-bp error-corrected, short (fragmented) reads from these long reads to create matched long-read, fragmented long-read (simulated short-read), and Illumina short-read data for 67 SG-NEx samples.",
+      "category": "Methods",
+      "difficulty": "advanced"
+    },
+    {
+      "id": "bench_10.1038/s41592-025-02623-4_4",
+      "source_paper_id": "10.1038/s41592-025-02623-4",
+      "question": "Which tool was used in the SG-NEx study for fusion gene detection from long-read RNA-seq data?",
+      "ground_truth_answer": "JAFFAL was used for fusion gene detection from long-read RNA-seq data.",
+      "category": "Tools",
+      "difficulty": "intermediate"
+    },
+    {
+      "id": "bench_10.1038/s41592-025-02623-4_5",
+      "source_paper_id": "10.1038/s41592-025-02623-4",
+      "question": "What was the key finding regarding major isoform identification when comparing long-read and short-read RNA-seq in the SG-NEx study?",
+      "ground_truth_answer": "Long-read RNA-seq identifies major isoforms more robustly than short-read RNA-seq. The study showed that long-read-specific major isoforms had higher correlation between technologies and were confirmed by qPCR and dPCR to be the most abundant, while short-read-specific major isoforms were often lowly expressed and impacted by read fragmentation.",
+      "category": "Benchmarking",
+      "difficulty": "advanced"
+    }
+  ]
+}
