@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """Serve the bundled static knowledge explorer locally."""
 
 from __future__ import annotations

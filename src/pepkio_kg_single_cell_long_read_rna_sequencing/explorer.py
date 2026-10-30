@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """KnowledgeExplorer — programmatic access to bundled knowledge graph data."""
 
 from __future__ import annotations

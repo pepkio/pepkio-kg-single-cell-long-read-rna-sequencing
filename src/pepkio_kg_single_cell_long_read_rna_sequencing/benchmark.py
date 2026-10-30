@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """Filter and export benchmark Q&A entries."""
 
 from __future__ import annotations

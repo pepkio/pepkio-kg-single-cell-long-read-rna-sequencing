@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """Pepkio Knowledge Explorer: Single-Cell Long-Read RNA Sequencing."""
 
 from .explorer import KnowledgeExplorer

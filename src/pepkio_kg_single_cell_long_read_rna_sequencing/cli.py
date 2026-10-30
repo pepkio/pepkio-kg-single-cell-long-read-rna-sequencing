@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """CLI for the Pepkio Knowledge Explorer package."""
 
 from __future__ import annotations

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """Load bundled knowledge graph JSON from package data."""
 
 from __future__ import annotations
